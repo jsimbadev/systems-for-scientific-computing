@@ -1,144 +1,106 @@
 # Systems for Scientific Computing
 
-A practical course on the systems foundations that make scientific data workflows understandable, efficient, and scalable.
+**Systems for Scientific Computing** is a practical course on the systems foundations of scientific software: how data is represented, stored, accessed, queried, and moved through computational workflows.
 
-The course starts from familiar scientific Python and dataframe workflows, then progressively exposes the layers underneath them: numerical representation, raw bytes, memory layout, file formats, query execution, data structures, storage layout, and distributed computation.
+The course is intended for computational researchers and scientific programmers who already know how to write code, but want a stronger mental model of what happens beneath high-level scientific Python and dataframe APIs.
 
-The central question throughout is:
+## Purpose
 
-> **What work is the machine actually doing, and which bytes really need to move?**
+Modern scientific work routinely involves large arrays, simulation outputs, tabular data, meshes, trajectories, experimental measurements, and generated data from computational algorithms. Researchers need to read, write, search, filter, aggregate, join, serialize, and move these data efficiently and reliably.
 
-## Why this course?
+This course develops the systems literacy needed to reason about those operations.
 
-Scientific programmers routinely search, filter, aggregate, join, serialize, store, and move data. High-level tools make these operations convenient, but convenience can hide the physical work being performed.
+Its central principle is that the performance and scalability of scientific software depend not only on the mathematical algorithm, but also on how data is physically represented and accessed.
 
-This course is designed to build a systems-level mental model for computational research. Rather than teaching data structures, databases, or distributed systems in isolation, it introduces them when a scientific workload makes them necessary.
-
-A recurring progression is:
+The course therefore connects high-level scientific workflows to the layers beneath them:
 
 ```text
-scientific question
-        ↓
-high-level operation
-        ↓
-algorithm
-        ↓
-data structure
-        ↓
-memory / storage representation
-        ↓
-disk / network traffic
+scientific problem
+      ↓
+data access pattern
+      ↓
+algorithm and data structure
+      ↓
+memory representation
+      ↓
+storage layout
+      ↓
+disk and network traffic
 ```
 
-The goal is not to turn scientists into database engineers. It is to make scientific programmers able to reason about performance, representation, storage, and scale instead of treating these layers as black boxes.
+## Learning objectives
 
-## Course structure
+By the end of the course, students should be able to:
 
-The material is being designed to work at multiple resolutions: a single standalone session, a half-day workshop, or a multi-session mini-course.
+- reason about numerical data as typed bytes in memory and on disk;
+- understand how dtypes, array layout, strides, views, copies, and memory mapping affect computation;
+- explain the trade-offs between text, binary, row-oriented, column-oriented, and chunked storage formats;
+- choose storage formats and layouts according to expected access patterns;
+- interpret common dataframe operations such as filtering, grouping, sorting, and joining in algorithmic terms;
+- understand how indexing, hashing, sorting, and partitioning arise from concrete data-access requirements;
+- reason about out-of-core workflows when data exceeds available memory;
+- understand the role of locality, serialization, partitioning, and network movement in distributed scientific computation;
+- identify when performance can be improved by reducing unnecessary data movement rather than accelerating arithmetic.
 
-### 1. Representation — data is bytes
+## Course content
 
-**Focus:** what numerical data physically is.
+The material is organized around four complementary themes.
 
-Topics include:
+### Representation
 
-- binary representation and typed values;
-- `struct`, offsets, endianness, and serialization;
-- NumPy dtypes and contiguous arrays;
-- strides, views, copies, and memory layout;
-- memory mapping and partial access.
+How numerical data is represented in memory and on disk.
 
-A planned opening exercise constructs a valid WAV file directly from raw bytes: generate a sinusoid, quantize the samples, write the header and payload, and play the resulting file. The point is not audio programming; it is to make schema, layout, types, offsets, and serialization tangible.
+Topics include binary representation, typed values, endianness, serialization, NumPy dtypes, contiguous arrays, strides, memory layout, direct binary I/O, and memory mapping.
 
-### 2. Storage — file formats are data structures
+### Storage
 
-**Focus:** how physical layout determines which access patterns are cheap.
+How file formats and physical layout affect the cost of scientific data access.
 
-Topics include:
+Topics include CSV, raw binary data, NumPy formats, Parquet, HDF5, Zarr, columnar storage, chunking, compression, projection, predicate pushdown, and partial reads.
 
-- text versus binary formats;
-- CSV, NumPy formats, Parquet, HDF5, and Zarr;
-- row-oriented and column-oriented layouts;
-- chunking and compression;
-- projection and predicate pushdown;
-- reading fewer bytes rather than processing unnecessary data faster.
+### Querying
 
-### 3. Querying — what is a dataframe operation really doing?
+How common dataframe operations map to algorithms and data structures.
 
-**Focus:** interpreting familiar pandas workflows as computational operations.
+Topics include scans, filtering, aggregation, grouping, sorting, repeated lookup, indexes, joins, hashing, and range queries. Pandas is used as a familiar interface through which these underlying operations can be examined.
 
-Examples include:
+### Distribution
 
-- filtering as scanning and predicate evaluation;
-- `groupby` as aggregation;
-- `merge` as a join;
-- sorting and indexing;
-- repeated lookup and range queries.
+How data-intensive scientific workflows change when computation spans processes or machines.
 
-This section motivates data structures and algorithms from concrete workloads rather than treating them as interview exercises.
+Topics include partitioning, data locality, serialization, network transfer, distributed aggregation, joins, shuffles, and the relationship between computational work and data placement.
 
-### 4. Distribution — data lives somewhere
+## Practical approach
 
-**Focus:** what changes when data no longer fits comfortably in one process or on one machine.
+The course is exercise-driven. Students work with concrete scientific and numerical data problems and inspect the consequences of different representations, storage layouts, and algorithms.
 
-Topics include:
+Exercises are designed to connect low-level mechanisms to high-level scientific workflows. Examples include constructing binary data formats directly, comparing storage formats under different query patterns, implementing simplified versions of dataframe operations, and working with partitioned simulation or generated scientific data.
 
-- partitioning and data locality;
-- serialization and network movement;
-- shuffles and distributed joins;
-- local aggregation;
-- moving computation to data versus moving data to computation;
-- scientific workloads built from generated simulation or inference data.
+The emphasis is on transferable mental models rather than mastery of any one library or technology.
 
-## Teaching philosophy
+## Delivery
 
-The course follows one rule wherever possible:
+The material is modular. It can be delivered as a single standalone session, a workshop, or a sequence of sessions with progressively deeper treatment of representation, storage, querying, and distributed execution.
 
-> **Do not introduce a systems abstraction before the workload gives students a reason to want it.**
+Python, NumPy, and pandas are used for many examples because of their ubiquity in scientific computing, but the systems principles are language-independent.
 
-A slow repeated scan motivates an index. A huge CSV motivates columnar storage. A dataset larger than memory motivates streaming and memory mapping. A distributed join motivates partitioning and shuffles.
+## Repository
 
-The intended pattern is:
+This repository contains the course materials and supporting software, including exercises, executable demonstrations, benchmark experiments, teaching notes, and reference material.
 
-```text
-experience the problem
-        ↓
-explain the physical work
-        ↓
-introduce the engineering response
-```
-
-## Audience
-
-The course is intended primarily for computational researchers and scientific programmers who already have some programming experience but want a stronger mental model for the systems beneath their workflows.
-
-Examples are expected to use Python, NumPy, and pandas because of their ubiquity in scientific work, but the underlying ideas are language-independent.
-
-## Status
-
-This repository is in early development. The first goal is to produce and deliver the course, gather feedback, and iterate on the exercises before publishing a polished public release.
-
-Planned material will include:
-
-- lecture notes;
-- executable demonstrations;
-- hands-on exercises;
-- benchmark experiments;
-- instructor notes;
-- reference solutions where appropriate;
-- a scientific capstone connecting storage, queries, and distributed execution.
+The project is under active development.
 
 ## Contributing
 
-Contributions, corrections, examples, and teaching feedback are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md) once the initial project scaffold is merged.
+Contributions, corrections, examples, and teaching feedback are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution guidelines.
 
 This repository uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
 
 ## Licensing
 
-This project is intended to be openly reusable.
+The project is intended to be openly reusable.
 
-- **Code** is licensed under the MIT License.
+- **Code and software examples** are licensed under the MIT License.
 - **Teaching material and documentation** are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
 
-See the licence files in the repository for details.
+See the repository licence files for details.
