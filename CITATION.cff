@@ -1,8 +1,0 @@
-cff-version: 1.2.0
-message: "If you use or adapt this course, please cite the repository using the metadata below."
-title: "Systems for Scientific Computing"
-authors:
-  - family-names: Simbananiye
-    given-names: Jordan
-repository-code: "https://github.com/jsimbadev/systems-for-scientific-computing"
-url: "https://github.com/jsimbadev/systems-for-scientific-computing"
